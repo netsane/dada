@@ -10,13 +10,37 @@ export const login = (req, res) => {
     return res.status(401).json({ message: 'Invalid username or password.' });
   }
 
-  const token = jwt.sign({ username }, process.env.JWT_SECRET || 'sis-export-demo', {
-    expiresIn: '8h',
-  });
+  const role = user.role_name || user.role_id || 'employee';
+const modules = user.modules || user.role_modules || ['finance', 'hr', 'material'];
+let permissions = user.permissions || [];
+if (typeof permissions === 'string') {
+  try { permissions = JSON.parse(permissions); } catch { permissions = []; }
+}
+if (!Array.isArray(permissions)) permissions = [];
 
-  return res.json({
-    success: true,
-    token,
-    user: { username },
-  });
-};
+const token = jwt.sign(
+  {
+    sub: user.id,
+    username: user.username,
+    name: user.display_name || user.username,
+    role,
+    modules,
+    permissions,   // ← ADD THIS
+  },
+  process.env.JWT_SECRET || 'unity-sis-dev',
+  { expiresIn: process.env.JWT_EXPIRES_IN || '12h' }
+);
+
+return res.json({
+  success: true,
+  token,
+  user: {
+    id: user.id,
+    username: user.username,
+    name: user.display_name || user.username,
+    role,
+    modules,
+    permissions,   // ← ADD THIS
+    employee_id: user.employee_id,
+  },
+});
