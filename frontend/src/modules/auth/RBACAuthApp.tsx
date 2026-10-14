@@ -517,7 +517,15 @@ export default function RBACAuthApp(): JSX.Element {
         </div>
       ) : canAccessModule(session.role, 'export', session.modules) ? (
         <div className="rbac-dashboard-shell">
-          <ExportApp />
+          <ExportApp
+  role={session.role}
+  permissions={currentPermissions}
+  canViewContract={hasPermission(session.role, 'CONTRACT_VIEW', roles)}
+  canEditContract={hasPermission(session.role, 'CONTRACT_EDIT', roles)}
+  canAdd={hasPermission(session.role, 'CAN_ADD_RECORD', roles)}
+  canEdit={hasPermission(session.role, 'CAN_EDIT_RECORD', roles)}
+  canDelete={hasPermission(session.role, 'CAN_DELETE_RECORD', roles)}
+/>
           <div className="rbac-analytics-grid" style={{ marginTop: 18 }}>
             <div className="rbac-panel">
               <h3>My permissions</h3>
