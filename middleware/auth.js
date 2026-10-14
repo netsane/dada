@@ -16,3 +16,21 @@ export const requireAuth = (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized. Invalid token.' });
   }
 };
+function requirePermission(...needed) {
+  return (req, res, next) => {
+    const role = String(req.user?.role || '').toLowerCase();
+    if (role === 'admin' || role === 'super_admin') return next();
+
+    const perms = Array.isArray(req.user?.permissions) ? req.user.permissions.map(String) : [];
+    const ok = needed.some((p) => perms.includes(p) || perms.includes('*'));
+    if (!ok) {
+      return res.status(403).json({
+        success: false,
+        message: `Missing permission: ${needed.join(' or ')}`,
+      });
+    }
+    next();
+  };
+}
+
+module.exports = { authRequired, optionalAuth, requireModule, requirePermission };
