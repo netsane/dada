@@ -121,8 +121,18 @@ export function hasPermission(
 ): boolean {
   const r = normalizeRoleName(role);
   if (r === 'admin') return true;
-  const perms = getRolePermissions(role, roles);
-  if (perms.includes('*') || perms.includes(permissionKey)) return true;
+
+  const fromCatalog = roles.find(
+    (row) => normalizeRoleName(row.id) === r || normalizeRoleName(row.name) === r,
+  );
+
+  // Custom / catalog role: ONLY listed permissions
+  if (fromCatalog) {
+    const perms = fromCatalog.permissions || [];
+    return perms.includes('*') || perms.includes(permissionKey);
+  }
+
+  // Seeded roles not in catalog: use map
   const mapRoles = DEFAULT_PERMISSIONS_MAP[permissionKey] || [];
   return mapRoles.map(normalizeRoleName).includes(r);
 }
