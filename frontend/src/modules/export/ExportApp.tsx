@@ -114,6 +114,25 @@ const dataMap: Record<ExportTab, ExportRow[]> = {
   coffee: coffeeSeed,
   sesame: sesameSeed,
 };
+type ExportAppProps = {
+  role?: string;
+  permissions?: string[];
+  canViewContract?: boolean;
+  canEditContract?: boolean;
+  canAdd?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+};
+
+export default function ExportApp({
+  role = 'export_officer',
+  permissions = [],
+  canViewContract = true,
+  canEditContract = true,
+  canAdd = true,
+  canEdit = true,
+  canDelete = true,
+}: ExportAppProps = {}) {
 
 const money = (value = 0): string => currency.format(Number(value) || 0);
 const compactMoney = (value = 0): string => compactCurrency.format(Number(value) || 0);
